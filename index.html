@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workplace Leave Culture Survey</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="survey-container">
+        <!-- Progress Bar -->
+        <div class="progress-header">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-info">
+                <span id="questionCounter">Question 1 of 23</span>
+                <span id="sectionIndicator">Section 1: Preliminary Information</span>
+            </div>
+        </div>
+
+        <!-- Survey Content -->
+        <div class="survey-content">
+            <!-- Welcome Screen -->
+            <div class="question-slide active" id="welcome">
+                <div class="question-content">
+                    <h1>Workplace Leave Culture Survey</h1>
+                    <p class="subtitle">Understanding barriers to taking time off and workplace wellness culture</p>
+                    <p class="description">This survey explores how workplace culture and personal attitudes affect employees' ability to take vacation leave. Your responses are anonymous and will help improve workplace wellness policies.</p>
+                    <button class="next-btn" onclick="nextQuestion()">Start Survey →</button>
+                </div>
+            </div>
+
+            <!-- Section 1: Preliminary Information -->
+            
+            <!-- Question 1: Employment Type -->
+            <div class="question-slide" id="q1">
+                <div class="question-content">
+                    <h2>What is your employment type?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Full-Time (Permanent)">
+                            <span>Full-Time (Permanent)</span>
+                        </div>
+                        <div class="option" data-value="Contractual/Freelancer">
+                            <span>Contractual/Freelancer</span>
+                        </div>
+                        <div class="option" data-value="Part-Time">
+                            <span>Part-Time</span>
+                        </div>
+                        <div class="option" data-value="Intern">
+                            <span>Intern</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 2: Years of Experience -->
+            <div class="question-slide" id="q2">
+                <div class="question-content">
+                    <h2>How many years of experience do you have?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="0–2 years">
+                            <span>0–2 years</span>
+                        </div>
+                        <div class="option" data-value="3–5 years">
+                            <span>3–5 years</span>
+                        </div>
+                        <div class="option" data-value="6–10 years">
+                            <span>6–10 years</span>
+                        </div>
+                        <div class="option" data-value="10+ years">
+                            <span>10+ years</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 3: Job Role Type -->
+            <div class="question-slide" id="q3">
+                <div class="question-content">
+                    <h2>What is your job role type?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Junior employee">
+                            <span>Junior employee</span>
+                        </div>
+                        <div class="option" data-value="Team Lead">
+                            <span>Team Lead</span>
+                        </div>
+                        <div class="option" data-value="Junior Manager">
+                            <span>Junior Manager</span>
+                        </div>
+                        <div class="option" data-value="Mid level Manager">
+                            <span>Mid level Manager</span>
+                        </div>
+                        <div class="option" data-value="Senior Manager">
+                            <span>Senior Manager</span>
+                        </div>
+                        <div class="option" data-value="HR">
+                            <span>HR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Cognitive and Emotional Blocks to Taking Leave -->
+
+            <!-- Question 4: Vacation Days Taken -->
+            <div class="question-slide" id="q4">
+                <div class="question-content">
+                    <h2>In the past 1 year, how many vacation leave days have you taken (excluding sick leave)?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="None">
+                            <span>None</span>
+                        </div>
+                        <div class="option" data-value="1–3">
+                            <span>1–3</span>
+                        </div>
+                        <div class="option" data-value="4–6">
+                            <span>4–6</span>
+                        </div>
+                        <div class="option" data-value="7–10">
+                            <span>7–10</span>
+                        </div>
+                        <div class="option" data-value="10+">
+                            <span>10+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5: Postponed Leave Reasons (Multi-select) -->
+            <div class="question-slide" id="q5">
+                <div class="question-content">
+                    <h2>Have you ever postponed or cancelled a planned leave due to:</h2>
+                    <p class="subtitle">(Check all that apply)</p>
+                    <div class="options-container checkbox-options">
+                        <div class="checkbox-option" data-value="Guilt or shame about leaving the team">
+                            <input type="checkbox" id="reason1">
+                            <label for="reason1">Guilt or shame about leaving the team</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Pressure from a manager or client">
+                            <input type="checkbox" id="reason2">
+                            <label for="reason2">Pressure from a manager or client</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Feeling indispensable to the project">
+                            <input type="checkbox" id="reason3">
+                            <label for="reason3">Feeling indispensable to the project</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Fear of missing out on opportunities">
+                            <input type="checkbox" id="reason4">
+                            <label for="reason4">Fear of missing out on opportunities</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Anticipated work pile-up on return">
+                            <input type="checkbox" id="reason5">
+                            <label for="reason5">Anticipated work pile-up on return</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Team is understaffed">
+                            <input type="checkbox" id="reason6">
+                            <label for="reason6">Team is understaffed</label>
+                        </div>
+                        <div class="checkbox-option" data-value="No specific reason">
+                            <input type="checkbox" id="reason7">
+                            <label for="reason7">No specific reason</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I don't feel comfortable taking leave">
+                            <input type="checkbox" id="reason8">
+                            <label for="reason8">I don't feel comfortable taking leave</label>
+                        </div>
+                        <div class="checkbox-option other-option">
+                            <input type="checkbox" id="reason_other">
+                            <label for="reason_other">Other:</label>
+                            <input type="text" class="other-input" placeholder="Please specify..." disabled>
+                        </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 6: Emotions Associated with Leave -->
+            <div class="question-slide" id="q6">
+                <div class="question-content">
+                    <h2>When you think about taking leave, what emotions do you associate with it?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Relief">
+                            <span>Relief</span>
+                        </div>
+                        <div class="option" data-value="Guilt">
+                            <span>Guilt</span>
+                        </div>
+                        <div class="option" data-value="Anxiety">
+                            <span>Anxiety</span>
+                        </div>
+                        <div class="option" data-value="Indifference">
+                            <span>Indifference</span>
+                        </div>
+                        <div class="option" data-value="Joy">
+                            <span>Joy</span>
+                        </div>
+                        <div class="option" data-value="Shame">
+                            <span>Shame</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 7: Faking Illness -->
+            <div class="question-slide" id="q7">
+                <div class="question-content">
+                    <h2>Have you ever faked illness or made an excuse to justify personal leave?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Yes">
+                            <span>Yes</span>
+                        </div>
+                        <div class="option" data-value="No">
+                            <span>No</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Workplace Culture and Managerial Modelling -->
+
+            <!-- Question 8: Manager's Leave Behavior -->
+            <div class="question-slide" id="q8">
+                <div class="question-content">
+                    <h2>Does your manager regularly take visible time off?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Yes, and encourages the team to do the same">
+                            <span>Yes, and encourages the team to do the same</span>
+                        </div>
+                        <div class="option" data-value="Yes, but discourages others from doing so">
+                            <span>Yes, but discourages others from doing so</span>
+                        </div>
+                        <div class="option" data-value="Rarely takes time off">
+                            <span>Rarely takes time off</span>
+                        </div>
+                        <div class="option" data-value="I don't know">
+                            <span>I don't know</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 9: Team Attitude Rating -->
+            <div class="question-slide" id="q9">
+                <div class="question-content">
+                    <h2>How would you rate your team's attitude towards vacation leave?</h2>
+                    <div class="rating-container">
+                        <div class="rating-option" data-value="1">
+                            <div class="rating-number">1</div>
+                            <div class="rating-label">Taking leave is seen as irresponsible</div>
+                        </div>
+                        <div class="rating-option" data-value="2">
+                            <div class="rating-number">2</div>
+                            <div class="rating-label">Taking leave is respected and encouraged</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 10: Feeling Judged -->
+            <div class="question-slide" id="q10">
+                <div class="question-content">
+                    <h2>Do you feel judged or less committed when you take time off?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Agree">
+                            <span>Agree</span>
+                        </div>
+                        <div class="option" data-value="Disagree">
+                            <span>Disagree</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Behavioural Biases (Nudge Framework Triggers) -->
+
+            <!-- Question 11: Reasons for Avoiding Leave (Multi-select Top 3) -->
+            <div class="question-slide" id="q11">
+                <div class="question-content">
+                    <h2>Which of these reasons most reflect why you avoid taking leave?</h2>
+                    <p class="subtitle">(Select your top 3)</p>
+                    <div class="options-container checkbox-options">
+                        <div class="checkbox-option" data-value="I believe rest is a weakness">
+                            <input type="checkbox" id="bias1">
+                            <label for="bias1">I believe rest is a weakness</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I fear being replaced or forgotten">
+                            <input type="checkbox" id="bias2">
+                            <label for="bias2">I fear being replaced or forgotten</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I feel loyal to my team/client deadlines">
+                            <input type="checkbox" id="bias3">
+                            <label for="bias3">I feel loyal to my team/client deadlines</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I worry about job security">
+                            <input type="checkbox" id="bias4">
+                            <label for="bias4">I worry about job security</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I enjoy being seen as always available">
+                            <input type="checkbox" id="bias5">
+                            <label for="bias5">I enjoy being seen as always available</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I think my productivity will drop">
+                            <input type="checkbox" id="bias6">
+                            <label for="bias6">I think my productivity will drop</label>
+                        </div>
+                        <div class="checkbox-option" data-value="I don't want to burden others with my absence">
+                            <input type="checkbox" id="bias7">
+                            <label for="bias7">I don't want to burden others with my absence</label>
+                        </div>
+                        <div class="checkbox-option other-option">
+                            <input type="checkbox" id="bias_other">
+                            <label for="bias_other">Other:</label>
+                            <input type="text" class="other-input" placeholder="Please specify..." disabled>
+                        </div>
+                    </div>
+                    <div class="selection-counter">
+                        <span id="selectionCount">0</span> of 3 selected
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 12: Leave Expectations (Multi-select) -->
+            <div class="question-slide" id="q12">
+                <div class="question-content">
+                    <h2>If your leave application is approved, are you still expected to:</h2>
+                    <p class="subtitle">(Check all that apply)</p>
+                    <div class="options-container checkbox-options">
+                        <div class="checkbox-option" data-value="Attend meetings during leave">
+                            <input type="checkbox" id="expect1">
+                            <label for="expect1">Attend meetings during leave</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Answer emails/slack">
+                            <input type="checkbox" id="expect2">
+                            <label for="expect2">Answer emails/slack</label>
+                        </div>
+                        <div class="checkbox-option" data-value="Be available on calls">
+                            <input type="checkbox" id="expect3">
+                            <label for="expect3">Be available on calls</label>
+                        </div>
+                        <div class="checkbox-option" data-value="None of the above">
+                            <input type="checkbox" id="expect4">
+                            <label for="expect4">None of the above</label>
+                        </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 13: Nudge Response -->
+            <div class="question-slide" id="q13">
+                <div class="question-content">
+                    <h2>Would a reminder like this change your perception?</h2>
+                    <div class="nudge-quote">
+                        "Skipping this break may cost you more than it saves—60% of burnout stems from avoided recovery time."
+                    </div>
+                    <div class="options-container">
+                        <div class="option" data-value="Yes">
+                            <span>Yes</span>
+                        </div>
+                        <div class="option" data-value="No">
+                            <span>No</span>
+                        </div>
+                        <div class="option" data-value="Maybe">
+                            <span>Maybe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Personal Insights and Suggestions -->
+
+            <!-- Question 14: What would make it easier (Open-ended) -->
+            <div class="question-slide" id="q14">
+                <div class="question-content">
+                    <h2>What would make it easier for you to take a guilt-free break at work?</h2>
+                    <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
+                    <p class="optional-note">This question is optional</p>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 15: Performance Impact (Open-ended) -->
+            <div class="question-slide" id="q15">
+                <div class="question-content">
+                    <h2>Do you think taking planned leave improves your performance when you return? Why or why not?</h2>
+                    <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
+                    <p class="optional-note">This question is optional</p>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 16: Manager App Features (Open-ended) -->
+            <div class="question-slide" id="q16">
+                <div class="question-content">
+                    <h2>What features in a leave-focused wellness app would you find most useful if you were a manager?</h2>
+                    <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
+                    <p class="optional-note">This question is optional</p>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
+                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thank You / Summary Page -->
+            <div class="question-slide" id="summary">
+                <div class="question-content">
+                    <h1>Thank you for your submission!</h1>
+                    <p class="subtitle">Your responses have been recorded successfully</p>
+                    
+                    <div class="summary-container">
+                        <h3>Response Summary:</h3>
+                        <div id="responseSummary"></div>
+                    </div>
+                    
+                    <div class="final-message">
+                        <p>Your insights will help improve workplace wellness policies and create healthier work environments. All responses are anonymous and confidential.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
