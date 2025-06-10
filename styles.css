@@ -702,4 +702,125 @@ h3 {
         background: white;
         color: black;
     }
+}
+
+/* --- Results Page Specific Styles --- */
+.results-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #1a1a1a;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: #f0f0f0;
+}
+
+.results-header {
+    border-bottom: 1px solid #333;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.results-header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: #fff;
+}
+
+.results-header p {
+    margin: 5px 0 0;
+    font-size: 1.1rem;
+    color: #a0a0a0;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+}
+
+.results-btn {
+    background-color: #333;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.results-btn.primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.results-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.results-btn:disabled {
+    background-color: #2a2a2a;
+    border-color: #333;
+    color: #555;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#loader {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2rem;
+    color: #a0a0a0;
+}
+
+.table-wrapper {
+    overflow-x: auto; /* Allow horizontal scrolling for large tables */
+    max-height: 60vh;
+    border: 1px solid #333;
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+    white-space: nowrap; /* Prevent line breaks within cells */
+}
+
+th {
+    background-color: #222;
+    font-weight: 600;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #1e1e1e;
+}
+
+tbody tr:hover {
+    background-color: #282828;
+}
+
+td {
+    color: #ccc;
 } 

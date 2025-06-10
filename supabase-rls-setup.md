@@ -1,16 +1,18 @@
-# Supabase Database Setup
+# Supabase Row Level Security (RLS) Setup
 
-Follow these steps to create the necessary table in your Supabase project to store the survey responses.
+Follow these steps to configure the necessary Row Level Security (RLS) policies for your `survey_responses` table. This is a critical security step that allows anonymous users to submit the survey and view the results securely, without giving them access to your database.
 
-### 1. Navigate to the SQL Editor
+### 1. Enable Row Level Security (RLS)
 
-1.  Open your Supabase project dashboard.
-2.  In the left-hand menu, click on the **SQL Editor** icon.
-3.  Click **"New query"**.
+First, you must enable RLS on your table if it isn't already.
 
-### 2. Create the `survey_responses` Table
+1.  Navigate to **Authentication** > **Policies** in your Supabase dashboard.
+2.  Find the `survey_responses` table.
+3.  If it says "RLS is disabled", click the **"Enable RLS"** button.
 
-Copy the entire SQL code block below and paste it into the Supabase SQL editor.
+### 2. Create the Table (If Needed)
+
+If you haven't created the table yet, or if you need to reset it, run this query in the **SQL Editor**. This script will safely delete any old version of the table and its dependencies before creating the new one.
 
 ```sql
 -- This line will safely delete the old table if it exists, along with any
@@ -28,9 +30,8 @@ CREATE TABLE public.survey_responses (
     -- Section 2
     vacation_days_taken text,
     postponed_leave text,
-    postpone_reasons jsonb,
     cancelled_leave text,
-    cancel_reasons jsonb,
+    postpone_cancel_reasons jsonb,
     leave_emotions text,
     faked_illness text,
     -- Section 3
@@ -54,9 +55,8 @@ COMMENT ON COLUMN public.survey_responses.years_experience IS 'Q2: Years of Expe
 COMMENT ON COLUMN public.survey_responses.job_role_type IS 'Q3: Job Role Type';
 COMMENT ON COLUMN public.survey_responses.vacation_days_taken IS 'Q4: Vacation Days Taken';
 COMMENT ON COLUMN public.survey_responses.postponed_leave IS 'Q5a: Ever postponed a planned leave?';
-COMMENT ON COLUMN public.survey_responses.postpone_reasons IS 'Q5b: Reasons for postponing leave';
 COMMENT ON COLUMN public.survey_responses.cancelled_leave IS 'Q5c: Ever cancelled a planned leave?';
-COMMENT ON COLUMN public.survey_responses.cancel_reasons IS 'Q5d: Reasons for cancelling leave';
+COMMENT ON COLUMN public.survey_responses.postpone_cancel_reasons IS 'Q5b: Reasons for postponing or cancelling leave';
 COMMENT ON COLUMN public.survey_responses.leave_emotions IS 'Q6: Emotions associated with leave';
 COMMENT ON COLUMN public.survey_responses.faked_illness IS 'Q7: Faked illness for leave';
 COMMENT ON COLUMN public.survey_responses.manager_takes_leave IS 'Q8: Manager''s leave behavior';
@@ -70,15 +70,30 @@ COMMENT ON COLUMN public.survey_responses.manager_app_features IS 'Q16: Useful m
 COMMENT ON COLUMN public.survey_responses.raw_responses IS 'A complete JSON backup of the raw response object from the client.';
 ```
 
-Click the **"RUN"** button to execute the query. This will create your table.
+### 3. Create Security Policies
 
-### 3. Disable Row Level Security (RLS)
+After enabling RLS, no one can access the table until you create policies. Go to the **SQL Editor** and run the following two queries one by one.
 
-For the survey to be able to write data from the browser, you need to allow anonymous inserts into this new table. The easiest way to do this is to disable Row Level Security (RLS) for the `survey_responses` table.
+#### Policy 1: Allow Anonymous Insert Access
+This policy allows anyone (the `anon` role) to insert a new row into the `survey_responses` table. This is required for the survey form to save new submissions.
 
-1.  In the left-hand menu, click on **Authentication**.
-2.  Select **Policies**.
-3.  Find the `survey_responses` table in the list. It will likely say "RLS is enabled".
-4.  Click the **"Disable RLS"** button next to it.
+```sql
+CREATE POLICY "Allow anonymous survey submissions"
+ON public.survey_responses
+FOR INSERT
+TO anon
+WITH CHECK (true);
+```
 
-That's it! Your project is now fully configured to save data to Supabase. 
+#### Policy 2: Allow Anonymous Read Access
+This policy allows anyone (the `anon` role) to read (select) all data from the table. This is required for the public `results.html` page to display the responses.
+
+```sql
+CREATE POLICY "Allow anonymous read access to all responses"
+ON public.survey_responses
+FOR SELECT
+TO anon
+USING (true);
+```
+
+After running these queries, your survey and the new results page will be able to access the data securely. 

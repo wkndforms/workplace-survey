@@ -27,7 +27,7 @@ class SurveyApp {
 
         this.sectionMap = {
             'q1': 'Section 1: Preliminary Information', 'q2': 'Section 1: Preliminary Information', 'q3': 'Section 1: Preliminary Information',
-            'q4': 'Section 2: Cognitive & Emotional Blocks', 'q5a': 'Section 2: Cognitive & Emotional Blocks', 'q5b': 'Section 2: Cognitive & Emotional Blocks', 'q5c': 'Section 2: Cognitive & Emotional Blocks', 'q5d': 'Section 2: Cognitive & Emotional Blocks', 'q6': 'Section 2: Cognitive & Emotional Blocks', 'q7': 'Section 2: Cognitive & Emotional Blocks',
+            'q4': 'Section 2: Cognitive & Emotional Blocks', 'q5a': 'Section 2: Cognitive & Emotional Blocks', 'q5c': 'Section 2: Cognitive & Emotional Blocks', 'q5b': 'Section 2: Cognitive & Emotional Blocks', 'q6': 'Section 2: Cognitive & Emotional Blocks', 'q7': 'Section 2: Cognitive & Emotional Blocks',
             'q8': 'Section 3: Workplace Culture', 'q9': 'Section 3: Workplace Culture', 'q10': 'Section 3: Workplace Culture',
             'q11': 'Section 4: Behavioural Biases', 'q12': 'Section 4: Behavioural Biases',
             'q14': 'Section 5: Personal Insights', 'q15': 'Section 5: Personal Insights', 'q16': 'Section 5: Personal Insights',
@@ -114,23 +114,30 @@ class SurveyApp {
         const currentSlide = this.slides[this.currentQuestionIndex];
         const currentId = currentSlide.id;
 
-        // Branching logic now happens here, when 'Next' is clicked
+        // Branching logic for the postpone/cancel flow
         if (currentId === 'q5a') {
-            const response = this.responses.q5a;
-            // If no response, default to 'No' path
-            response === 'Yes' ? this.goToQuestionById('q5b') : this.goToQuestionById('q5c');
+            this.goToQuestionById('q5c'); // Always go to 'cancelled' question next
             return;
         }
+
         if (currentId === 'q5c') {
-            const response = this.responses.q5c;
-            // If no response, default to 'No' path
-            response === 'Yes' ? this.goToQuestionById('q5d') : this.goToQuestionById('q6');
+            const postponed = this.responses.q5a === 'Yes';
+            const cancelled = this.responses.q5c === 'Yes';
+            // If user answered 'Yes' to either, show the reasons question
+            if (postponed || cancelled) {
+                this.goToQuestionById('q5b');
+            } else {
+                // Otherwise, skip reasons and go to the next section
+                this.goToQuestionById('q6');
+            }
             return;
         }
         
-        // Logic to jump from reasons pages
-        if (currentId === 'q5b') { this.goToQuestionById('q5c'); return; }
-        if (currentId === 'q5d') { this.goToQuestionById('q6'); return; }
+        // After giving reasons (or if skipped), continue to the next section
+        if (currentId === 'q5b') { 
+            this.goToQuestionById('q6'); 
+            return; 
+        }
 
         if (this.currentQuestionIndex < this.slides.length - 1) {
             this.history.push(this.currentQuestionIndex);
@@ -166,7 +173,7 @@ class SurveyApp {
      * Updates the progress bar and question counter text.
      */
     updateProgress() {
-        const visibleSlides = this.slides.filter(s => s.id !== 'welcome' && s.id !== 'summary' && s.id !== 'q5b' && s.id !== 'q5d');
+        const visibleSlides = this.slides.filter(s => s.id !== 'welcome' && s.id !== 'summary' && s.id !== 'q5b');
         const totalQuestions = visibleSlides.length;
         let currentQ = this.history.length;
         
@@ -224,9 +231,8 @@ class SurveyApp {
             vacation_days_taken: this.responses.q4,
             // Q5
             postponed_leave: this.responses.q5a,
-            postpone_reasons: this.responses.q5b,
             cancelled_leave: this.responses.q5c,
-            cancel_reasons: this.responses.q5d,
+            postpone_cancel_reasons: this.responses.q5b,
             // Q6-Q10
             leave_emotions: this.responses.q6,
             faked_illness: this.responses.q7,
