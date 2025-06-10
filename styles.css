@@ -224,17 +224,14 @@ h3 {
 }
 
 .subtitle {
-    font-size: 1.25rem;          /* Larger for better hierarchy */
+    font-size: 1.1rem;
     color: var(--text-secondary);
-    margin-bottom: var(--spacing-xl);
-    font-weight: var(--font-weight-regular);
-    line-height: 1.4;
-    text-align: center;
+    margin-bottom: 2rem;
 }
 
 .description {
     font-size: 1rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin-bottom: var(--spacing-2xl);
     line-height: 1.6;
     max-width: 600px;
@@ -490,82 +487,35 @@ h3 {
 /* Navigation Buttons */
 .navigation-buttons {
     display: flex;
-    justify-content: space-between;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-xl);
+    justify-content: flex-end;
+    margin-top: 2rem;
+    width: 100%;
 }
 
-.next-btn,
-.prev-btn {
-    background: var(--accent-cta);
+.prev-btn, .next-btn {
+    background-color: var(--primary-color);
     color: white;
     border: none;
-    border-radius: var(--radius-lg);
-    padding: 1.25rem 2.5rem;    /* Larger, more prominent buttons */
-    font-size: 1.125rem;         /* Slightly larger text */
-    font-weight: var(--font-weight-semibold);
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-    transition: all var(--transition-normal);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    min-width: 160px;            /* Wider buttons for easier clicking */
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    text-transform: none;
-    letter-spacing: 0.025em;
-    box-shadow: var(--shadow-md);
+    font-size: 1rem;
+    transition: background-color 0.3s, opacity 0.3s;
+    margin-left: 10px;
 }
 
-/* Add subtle gradient background */
-.next-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, var(--accent-cta), var(--accent-secondary));
-    z-index: -1;
-    transition: opacity var(--transition-normal);
+.prev-btn {
+    background-color: #333;
 }
 
-.next-btn:hover:not(:disabled) {
-    transform: translateY(-3px) scale(1.02);  /* More prominent hover effect */
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
-    background: var(--accent-secondary);
-}
-
-.next-btn:active:not(:disabled) {
-    transform: translateY(-1px) scale(1.01);
-    transition: all var(--transition-fast);
+.prev-btn:hover, .next-btn:hover {
+    opacity: 0.9;
 }
 
 .next-btn:disabled {
-    background: var(--text-disabled);
+    background-color: #555;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: var(--shadow-sm);
-    opacity: 0.6;
-}
-
-.prev-btn {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 2px solid var(--border-light);
-    box-shadow: none;
-    padding: 1rem 2rem;          /* Smaller than primary CTA */
-    font-size: 1rem;
-    min-width: 140px;
-}
-
-.prev-btn:hover {
-    background: var(--hover-bg);
-    border-color: var(--accent-primary);
-    color: var(--text-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    opacity: 0.7;
 }
 
 /* Summary Container */

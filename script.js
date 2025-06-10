@@ -1,696 +1,274 @@
-// Survey Application JavaScript
+/**
+ * SurveyApp
+ * Handles the core logic of the survey including navigation,
+ * data collection, validation, and submission.
+ */
 class SurveyApp {
     constructor() {
-        this.currentSlide = 0;
+        // Core Elements
+        this.slides = Array.from(document.querySelectorAll('.question-slide'));
+        this.progressBar = document.getElementById('progressBar');
+        this.questionCounter = document.getElementById('questionCounter');
+        this.sectionIndicator = document.getElementById('sectionIndicator');
+
+        // State
+        this.currentQuestionIndex = 0;
         this.responses = {};
-        this.totalQuestions = 17; // Welcome + 16 questions
-        this.isSubmitting = false;
+        this.history = []; // For back button functionality
+
+        // Configuration
+        const supabaseUrl = 'https://klvbfnjsklnkgmikudhv.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsdmJmbmpza2xua2dtaWt1ZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMTM4MjksImV4cCI6MjA2MzY4OTgyOX0.w7jC5eqHIHVEgxZJtRglQxpu4urTwujWxKovCk6l-9s';
+        this.supabase = supabaseUrl && supabaseKey ? supabase.createClient(supabaseUrl, supabaseKey) : null;
         
-        // Initialize Supabase
-        this.initializeSupabase();
-        
-        // Initialize EmailJS
-        this.initializeEmailJS();
-        
-        // Bind event handlers
-        this.bindEvents();
-        
-        // Initialize progress
-        this.updateProgress();
-        
-        // Handle keyboard navigation
-        this.handleKeyboardNavigation();
-        
-        console.log('Survey application initialized');
-    }
-    
-    initializeSupabase() {
-        // Supabase configuration - replace with your actual Supabase details
-        this.supabaseUrl = 'https://klvbfnjsklnkgmikudhv.supabase.co'; // Your Supabase project URL
-        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsdmJmbmpza2xua2dtaWt1ZGh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxMTM4MjksImV4cCI6MjA2MzY4OTgyOX0.w7jC5eqHIHVEgxZJtRglQxpu4urTwujWxKovCk6l-9s'; // Your Supabase anon key
-        this.tableName = 'survey_responses'; // The table name in your Supabase database
-        
-        // Check if Supabase is configured
-        if (this.supabaseUrl === 'YOUR_SUPABASE_URL' || this.supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
-            console.warn('Supabase not configured. Please update the credentials in script.js');
+        this.emailServiceId = 'YOUR_SERVICE_ID';
+        this.emailTemplateId = 'YOUR_TEMPLATE_ID';
+        this.emailPublicKey = 'YOUR_PUBLIC_KEY';
+
+        this.sectionMap = {
+            'q1': 'Section 1: Preliminary Information', 'q2': 'Section 1: Preliminary Information', 'q3': 'Section 1: Preliminary Information',
+            'q4': 'Section 2: Cognitive & Emotional Blocks', 'q5a': 'Section 2: Cognitive & Emotional Blocks', 'q5b': 'Section 2: Cognitive & Emotional Blocks', 'q5c': 'Section 2: Cognitive & Emotional Blocks', 'q5d': 'Section 2: Cognitive & Emotional Blocks', 'q6': 'Section 2: Cognitive & Emotional Blocks', 'q7': 'Section 2: Cognitive & Emotional Blocks',
+            'q8': 'Section 3: Workplace Culture', 'q9': 'Section 3: Workplace Culture', 'q10': 'Section 3: Workplace Culture',
+            'q11': 'Section 4: Behavioural Biases', 'q12': 'Section 4: Behavioural Biases',
+            'q14': 'Section 5: Personal Insights', 'q15': 'Section 5: Personal Insights', 'q16': 'Section 5: Personal Insights',
+        };
+
+        // Initial setup
+        this.initializeEventListeners();
+        this.updateUI();
+        if (this.emailPublicKey && this.emailPublicKey !== 'YOUR_PUBLIC_KEY') {
+            emailjs.init(this.emailPublicKey);
         }
     }
-    
-    initializeEmailJS() {
-        // Initialize EmailJS v4+ - updated initialization method
-        if (typeof emailjs !== 'undefined') {
-            emailjs.init({
-                publicKey: "uDnQ03H3ia-crL5L3", // Replace with your EmailJS public key
+
+    /**
+     * Centralized event listener initialization.
+     */
+    initializeEventListeners() {
+        document.getElementById('startBtn')?.addEventListener('click', () => this.showNextQuestion());
+        
+        this.slides.forEach(slide => {
+            slide.querySelector('.next-btn:not(#startBtn)')?.addEventListener('click', () => this.showNextQuestion());
+            slide.querySelector('.prev-btn')?.addEventListener('click', () => this.showPrevQuestion());
+
+            // For single-choice questions (.option, .rating-option)
+            slide.querySelectorAll('.option, .rating-option').forEach(option => {
+                option.addEventListener('click', () => this.handleSingleSelect(option));
             });
-        }
-        this.emailServiceId = "service_7b051ao"; // Replace with your service ID
-        this.emailTemplateId = "template_ycl6mnw"; // Replace with your template ID
-    }
-    
-    bindEvents() {
-        // Bind option clicks for single select questions
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.option')) {
-                this.handleSingleSelect(e.target.closest('.option'));
-            }
             
-            if (e.target.closest('.rating-option')) {
-                this.handleRatingSelect(e.target.closest('.rating-option'));
-            }
-        });
-        
-        // Bind checkbox events for multi-select questions
-        document.addEventListener('change', (e) => {
-            if (e.target.type === 'checkbox') {
-                this.handleCheckboxChange(e.target);
-            }
-        });
-        
-        // Bind text input events
-        document.addEventListener('input', (e) => {
-            if (e.target.classList.contains('text-input')) {
-                this.handleTextInput(e.target);
-            }
-            
-            if (e.target.classList.contains('other-input')) {
-                this.handleOtherInput(e.target);
-            }
+            // For multi-choice questions
+            slide.querySelectorAll('.checkbox-option input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', () => this.handleMultiSelect(checkbox));
+            });
+
+            // For text inputs
+            slide.querySelectorAll('textarea.text-input').forEach(textarea => {
+                textarea.addEventListener('input', () => this.handleTextInput(textarea));
+            });
         });
     }
-    
-    handleKeyboardNavigation() {
-        document.addEventListener('keydown', (e) => {
-            const activeSlide = document.querySelector('.question-slide.active');
-            const nextBtn = activeSlide.querySelector('.next-btn');
-            
-            // Enter key for next question (if next button is enabled)
-            if (e.key === 'Enter' && nextBtn && !nextBtn.disabled) {
-                e.preventDefault();
-                this.nextQuestion();
-            }
-            
-            // Number keys for single select options
-            if (e.key >= '1' && e.key <= '9') {
-                const options = activeSlide.querySelectorAll('.option, .rating-option');
-                const index = parseInt(e.key) - 1;
-                if (options[index]) {
-                    options[index].click();
-                }
-            }
-        });
-    }
-    
-    handleSingleSelect(option) {
-        const slide = option.closest('.question-slide');
-        const allOptions = slide.querySelectorAll('.option');
-        
-        // Remove selected class from all options
-        allOptions.forEach(opt => opt.classList.remove('selected'));
-        
-        // Add selected class to clicked option
-        option.classList.add('selected');
-        
-        // Store response
+
+    handleSingleSelect(selectedOption) {
+        const slide = selectedOption.closest('.question-slide');
         const questionId = slide.id;
-        const value = option.dataset.value;
+        const value = selectedOption.dataset.value;
         this.responses[questionId] = value;
-        
-        // Enable next button
-        this.enableNextButton(slide);
-        
-        // Auto-advance after a short delay for better UX
-        setTimeout(() => {
-            if (slide.classList.contains('active')) {
-                this.nextQuestion();
-            }
-        }, 600);
+
+        // Update selection visual
+        slide.querySelectorAll('.option.selected, .rating-option.selected').forEach(el => el.classList.remove('selected'));
+        selectedOption.classList.add('selected');
+
+        // The 'Next' button is now always enabled, so no logic is needed here.
     }
     
-    handleRatingSelect(option) {
-        const slide = option.closest('.question-slide');
-        const allOptions = slide.querySelectorAll('.rating-option');
-        
-        // Remove selected class from all options
-        allOptions.forEach(opt => opt.classList.remove('selected'));
-        
-        // Add selected class to clicked option
-        option.classList.add('selected');
-        
-        // Store response
-        const questionId = slide.id;
-        const value = option.dataset.value;
-        this.responses[questionId] = value;
-        
-        // Enable next button
-        this.enableNextButton(slide);
-        
-        // Auto-advance after a short delay
-        setTimeout(() => {
-            if (slide.classList.contains('active')) {
-                this.nextQuestion();
-            }
-        }, 600);
-    }
-    
-    handleCheckboxChange(checkbox) {
+    handleMultiSelect(checkbox) {
         const slide = checkbox.closest('.question-slide');
         const questionId = slide.id;
         
-        // Handle "Other" option
-        if (checkbox.id.includes('_other')) {
-            const otherInput = slide.querySelector('.other-input');
-            if (checkbox.checked) {
-                otherInput.disabled = false;
-                otherInput.focus();
-            } else {
-                otherInput.disabled = true;
-                otherInput.value = '';
-            }
-        }
-        
-        // Handle "None of the above" exclusivity for q12
-        if (questionId === 'q12' && checkbox.id === 'expect4' && checkbox.checked) {
-            const otherCheckboxes = slide.querySelectorAll('input[type="checkbox"]:not(#expect4)');
-            otherCheckboxes.forEach(cb => {
-                cb.checked = false;
-                cb.closest('.checkbox-option').classList.remove('selected');
-            });
-        } else if (questionId === 'q12' && checkbox.id !== 'expect4' && checkbox.checked) {
-            const noneCheckbox = slide.querySelector('#expect4');
-            if (noneCheckbox.checked) {
-                noneCheckbox.checked = false;
-                noneCheckbox.closest('.checkbox-option').classList.remove('selected');
-            }
-        }
-        
-        // Handle selection limit for q11 (top 3)
-        if (questionId === 'q11') {
-            this.handleTop3Selection(slide);
-        }
-        
-        // Update visual state
-        const checkboxOption = checkbox.closest('.checkbox-option');
-        if (checkbox.checked) {
-            checkboxOption.classList.add('selected');
-        } else {
-            checkboxOption.classList.remove('selected');
-        }
-        
-        // Store responses
-        this.storeCheckboxResponses(slide);
-        
-        // Validate and enable/disable next button
-        this.validateCheckboxQuestion(slide);
-    }
-    
-    handleTop3Selection(slide) {
-        const checkboxes = slide.querySelectorAll('input[type="checkbox"]:not(#bias_other)');
-        const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
-        const selectionCount = document.getElementById('selectionCount');
-        
-        // Update counter
-        selectionCount.textContent = checkedBoxes.length;
-        
-        // Disable other checkboxes if 3 are selected
-        if (checkedBoxes.length >= 3) {
-            checkboxes.forEach(cb => {
-                if (!cb.checked) {
-                    cb.disabled = true;
-                    cb.closest('.checkbox-option').style.opacity = '0.5';
-                }
-            });
-        } else {
-            checkboxes.forEach(cb => {
-                cb.disabled = false;
-                cb.closest('.checkbox-option').style.opacity = '1';
-            });
-        }
-    }
-    
-    handleTextInput(input) {
-        const slide = input.closest('.question-slide');
-        const questionId = slide.id;
-        this.responses[questionId] = input.value.trim();
-        
-        // Text inputs are optional, so always enable next button
-        this.enableNextButton(slide);
-    }
-    
-    handleOtherInput(input) {
-        const slide = input.closest('.question-slide');
-        const checkbox = slide.querySelector('input[type="checkbox"][id$="_other"]');
-        
-        if (input.value.trim()) {
-            checkbox.dataset.otherValue = input.value.trim();
-        } else {
-            delete checkbox.dataset.otherValue;
-        }
-        
-        this.storeCheckboxResponses(slide);
-    }
-    
-    storeCheckboxResponses(slide) {
-        const questionId = slide.id;
-        const checkboxes = slide.querySelectorAll('input[type="checkbox"]:checked');
-        const responses = [];
-        
-        checkboxes.forEach(checkbox => {
-            const option = checkbox.closest('.checkbox-option');
-            let value = option.dataset.value;
+        const selectedValues = Array.from(slide.querySelectorAll('input[type="checkbox"]:checked'))
+            .map(cb => cb.closest('.checkbox-option').dataset.value);
             
-            // Handle "Other" option
-            if (checkbox.id.includes('_other') && checkbox.dataset.otherValue) {
-                value = `Other: ${checkbox.dataset.otherValue}`;
-            }
-            
-            responses.push(value);
+        this.responses[questionId] = selectedValues;
+        
+        // The 'Next' button is now always enabled, so no logic is needed here.
+    }
+    
+    handleTextInput(textarea) {
+        const slide = textarea.closest('.question-slide');
+        this.responses[slide.id] = textarea.value.trim();
+    }
+
+    goToQuestionById(id) {
+        const targetIndex = this.slides.findIndex(slide => slide.id === id);
+        if (targetIndex !== -1) {
+            this.history.push(this.currentQuestionIndex);
+            this.currentQuestionIndex = targetIndex;
+            this.updateUI();
+        }
+    }
+
+    /**
+     * Moves to the next question slide.
+     */
+    showNextQuestion() {
+        const currentSlide = this.slides[this.currentQuestionIndex];
+        const currentId = currentSlide.id;
+
+        // Branching logic now happens here, when 'Next' is clicked
+        if (currentId === 'q5a') {
+            const response = this.responses.q5a;
+            // If no response, default to 'No' path
+            response === 'Yes' ? this.goToQuestionById('q5b') : this.goToQuestionById('q5c');
+            return;
+        }
+        if (currentId === 'q5c') {
+            const response = this.responses.q5c;
+            // If no response, default to 'No' path
+            response === 'Yes' ? this.goToQuestionById('q5d') : this.goToQuestionById('q6');
+            return;
+        }
+        
+        // Logic to jump from reasons pages
+        if (currentId === 'q5b') { this.goToQuestionById('q5c'); return; }
+        if (currentId === 'q5d') { this.goToQuestionById('q6'); return; }
+
+        if (this.currentQuestionIndex < this.slides.length - 1) {
+            this.history.push(this.currentQuestionIndex);
+            this.currentQuestionIndex++;
+            this.updateUI();
+        }
+    }
+
+    /**
+     * Moves to the previous question slide.
+     */
+    showPrevQuestion() {
+        if (this.history.length > 0) {
+            this.currentQuestionIndex = this.history.pop();
+            this.updateUI();
+        }
+    }
+
+    /**
+     * Updates all UI elements based on the current state.
+     * - Shows the correct slide.
+     * - Updates the progress bar and counter.
+     * - Manages navigation button visibility.
+     */
+    updateUI() {
+        this.slides.forEach((slide, index) => {
+            slide.classList.toggle('active', index === this.currentQuestionIndex);
         });
-        
-        this.responses[questionId] = responses;
-    }
-    
-    validateCheckboxQuestion(slide) {
-        const questionId = slide.id;
-        const checkboxes = slide.querySelectorAll('input[type="checkbox"]:checked');
-        
-        if (checkboxes.length > 0) {
-            this.enableNextButton(slide);
-        } else {
-            this.disableNextButton(slide);
-        }
-    }
-    
-    enableNextButton(slide) {
-        const nextBtn = slide.querySelector('.next-btn');
-        if (nextBtn) {
-            nextBtn.disabled = false;
-        }
-    }
-    
-    disableNextButton(slide) {
-        const nextBtn = slide.querySelector('.next-btn');
-        if (nextBtn) {
-            nextBtn.disabled = true;
-        }
-    }
-    
-    nextQuestion() {
-        if (this.isSubmitting) return;
-        
-        const currentSlideElement = document.querySelector('.question-slide.active');
-        const questionId = currentSlideElement.id;
-        
-        // Validate current question before proceeding
-        if (!this.validateCurrentQuestion(currentSlideElement)) {
-            return;
-        }
-        
-        // Special handling for last question
-        if (this.currentSlide >= this.totalQuestions - 1) {
-            this.submitSurvey();
-            return;
-        }
-        
-        // Move to next slide
-        this.currentSlide++;
-        this.showSlide(this.currentSlide);
         this.updateProgress();
     }
-    
-    previousQuestion() {
-        if (this.currentSlide > 0) {
-            this.currentSlide--;
-            this.showSlide(this.currentSlide);
-            this.updateProgress();
-        }
-    }
-    
-    validateCurrentQuestion(slide) {
-        const questionId = slide.id;
-        
-        // Skip validation for welcome and summary screens
-        if (questionId === 'welcome' || questionId === 'summary') {
-            return true;
-        }
-        
-        // Skip validation for optional text questions
-        if (questionId === 'q14' || questionId === 'q15' || questionId === 'q16') {
-            return true;
-        }
-        
-        // Validate single select questions
-        if (slide.querySelector('.option')) {
-            return slide.querySelector('.option.selected') !== null;
-        }
-        
-        // Validate rating questions
-        if (slide.querySelector('.rating-option')) {
-            return slide.querySelector('.rating-option.selected') !== null;
-        }
-        
-        // Validate checkbox questions
-        if (slide.querySelector('input[type="checkbox"]')) {
-            return slide.querySelector('input[type="checkbox"]:checked') !== null;
-        }
-        
-        return true;
-    }
-    
-    showSlide(index) {
-        // Hide all slides
-        document.querySelectorAll('.question-slide').forEach(slide => {
-            slide.classList.remove('active');
-        });
-        
-        // Show current slide
-        const slides = document.querySelectorAll('.question-slide');
-        if (slides[index]) {
-            slides[index].classList.add('active');
-            
-            // Focus management for accessibility
-            const firstFocusable = slides[index].querySelector('button, input, textarea, .option, .rating-option');
-            if (firstFocusable) {
-                setTimeout(() => firstFocusable.focus(), 100);
-            }
-        }
-    }
-    
+
+    /**
+     * Updates the progress bar and question counter text.
+     */
     updateProgress() {
-        const progressBar = document.getElementById('progressBar');
-        const questionCounter = document.getElementById('questionCounter');
-        const sectionIndicator = document.getElementById('sectionIndicator');
+        const visibleSlides = this.slides.filter(s => s.id !== 'welcome' && s.id !== 'summary' && s.id !== 'q5b' && s.id !== 'q5d');
+        const totalQuestions = visibleSlides.length;
+        let currentQ = this.history.length;
         
-        // Update progress bar
-        const progressPercent = (this.currentSlide / (this.totalQuestions - 1)) * 100;
-        progressBar.style.width = `${Math.min(progressPercent, 100)}%`;
-        
-        // Update question counter
-        const displayQuestion = Math.min(this.currentSlide + 1, this.totalQuestions);
-        questionCounter.textContent = `Question ${displayQuestion} of ${this.totalQuestions}`;
-        
-        // Update section indicator
-        const sectionInfo = this.getSectionInfo(this.currentSlide);
-        sectionIndicator.textContent = sectionInfo;
-    }
-    
-    getSectionInfo(slideIndex) {
-        if (slideIndex === 0) return "Welcome";
-        if (slideIndex >= 1 && slideIndex <= 3) return "Section 1: Preliminary Information";
-        if (slideIndex >= 4 && slideIndex <= 7) return "Section 2: Cognitive and Emotional Blocks";
-        if (slideIndex >= 8 && slideIndex <= 10) return "Section 3: Workplace Culture";
-        if (slideIndex >= 11 && slideIndex <= 13) return "Section 4: Behavioural Biases";
-        if (slideIndex >= 14 && slideIndex <= 16) return "Section 5: Personal Insights";
-        return "Survey Complete";
-    }
-    
-    async submitSurvey() {
-        if (this.isSubmitting) return;
-        
-        this.isSubmitting = true;
-        console.log('🚀 Starting survey submission...');
-        
-        try {
-            // Show loading state
-            this.showLoadingState();
-            console.log('📝 Loading state shown');
-            
-            // Prepare data for submission
-            const submissionData = this.prepareSubmissionData();
-            console.log('📊 Submission data prepared:', submissionData);
-            
-            // Submit to Supabase
-            console.log('💾 Attempting Supabase submission...');
-            const supabaseResult = await this.submitToSupabase(submissionData);
-            console.log('💾 Supabase result:', supabaseResult);
-            
-            // Email notifications now handled automatically by Supabase webhooks
-            // No need for client-side email sending
-            console.log('📧 Email notifications handled by Supabase webhooks');
-            
-            // Show summary page
-            console.log('📋 Showing summary page...');
-            this.showSummaryPage();
-            
-        } catch (error) {
-            console.error('❌ Submission error:', error);
-            alert('There was an error submitting your survey. Please try again.');
-        } finally {
-            this.isSubmitting = false;
-            console.log('✅ Survey submission process completed');
+        const currentSlide = this.slides[this.currentQuestionIndex];
+        const currentId = currentSlide.id;
+        const isWelcome = currentId === 'welcome';
+        const isSummary = currentId === 'summary';
+
+        if (isWelcome) {
+            this.progressBar.style.width = '0%';
+            this.questionCounter.textContent = ' ';
+            this.sectionIndicator.textContent = 'Welcome';
+        } else if (isSummary) {
+            this.progressBar.style.width = '100%';
+            this.questionCounter.textContent = 'Completed';
+            this.sectionIndicator.textContent = 'Finished';
+            this.populateSummary();
+            this.submitData();
+        } else {
+            const progress = (currentQ / totalQuestions) * 100;
+            this.progressBar.style.width = `${progress}%`;
+            this.questionCounter.textContent = `Question ${currentQ} of ${totalQuestions}`;
+            this.sectionIndicator.textContent = this.sectionMap[currentId] || '';
         }
     }
-    
-    prepareSubmissionData() {
-        const timestamp = new Date().toISOString();
-        const responseId = this.generateResponseId();
-        
-        // Get browser and system info
-        const browserInfo = this.getBrowserInfo();
-        
-        // Map responses to question texts
-        const questionMap = {
-            'q1': 'What is your employment type?',
-            'q2': 'How many years of experience do you have?',
-            'q3': 'What is your job role type?',
-            'q4': 'In the past 1 year, how many vacation leave days have you taken (excluding sick leave)?',
-            'q5': 'Have you ever postponed or cancelled a planned leave due to:',
-            'q6': 'When you think about taking leave, what emotions do you associate with it?',
-            'q7': 'Have you ever faked illness or made an excuse to justify personal leave?',
-            'q8': 'Does your manager regularly take visible time off?',
-            'q9': 'How would you rate your team\'s attitude towards vacation leave?',
-            'q10': 'Do you feel judged or less committed when you take time off?',
-            'q11': 'Which of these reasons most reflect why you avoid taking leave? (Top 3)',
-            'q12': 'If your leave application is approved, are you still expected to:',
-            'q13': 'Would a reminder like this change your perception?',
-            'q14': 'What would make it easier for you to take a guilt-free break at work?',
-            'q15': 'Do you think taking planned leave improves your performance when you return? Why or why not?',
-            'q16': 'What features in a leave-focused wellness app would you find most useful if you were a manager?'
-        };
-        
-        return {
-            responseId,
-            timestamp,
-            ...browserInfo,
-            responses: this.responses,
-            questionMap
-        };
-    }
-    
-    generateResponseId() {
-        return 'RESP_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-    
-    getBrowserInfo() {
-        const userAgent = navigator.userAgent;
-        
-        // Get IP address (this is approximate and may not work in all environments)
-        let ipAddress = 'Not available';
-        
-        return {
-            userAgent,
-            ipAddress,
-            language: navigator.language,
-            platform: navigator.platform,
-            screen: `${screen.width}x${screen.height}`,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-        };
-    }
-    
-    async submitToSupabase(data) {
-        // Check if Supabase is configured
-        if (this.supabaseUrl === 'YOUR_SUPABASE_URL' || this.supabaseKey === 'YOUR_SUPABASE_ANON_KEY') {
-            console.warn('Supabase not configured. Skipping Supabase submission.');
-            console.log('Data that would be submitted:', data);
-            return { success: true, message: 'Skipped - Supabase not configured' };
-        }
-        
-        try {
-            console.log('Attempting to submit to Supabase:', this.supabaseUrl);
-            console.log('Data being sent:', data);
-            
-            // Prepare data for Supabase table
-            const supabaseData = {
-                response_id: data.responseId,
-                timestamp: data.timestamp,
-                ip_address: data.ipAddress || null,
-                user_agent: data.userAgent || null,
-                language: data.language || null,
-                platform: data.platform || null,
-                screen: data.screen || null,
-                timezone: data.timezone || null,
-                
-                // Employment details
-                employment_type: data.responses.q1 || null,
-                years_experience: data.responses.q2 || null,
-                job_role_type: data.responses.q3 || null,
-                vacation_days_taken: data.responses.q4 || null,
-                
-                // Emotional blocks
-                postpone_reasons: Array.isArray(data.responses.q5) ? data.responses.q5 : [data.responses.q5],
-                leave_emotions: data.responses.q6 || null,
-                faked_illness: data.responses.q7 || null,
-                
-                // Workplace culture
-                manager_takes_leave: data.responses.q8 || null,
-                team_attitude_rating: data.responses.q9 || null,
-                feel_judged: data.responses.q10 || null,
-                
-                // Behavioral biases
-                avoid_leave_reasons: Array.isArray(data.responses.q11) ? data.responses.q11 : [data.responses.q11],
-                leave_expectations: Array.isArray(data.responses.q12) ? data.responses.q12 : [data.responses.q12],
-                
-                // Personal insights
-                nudge_response: data.responses.q13 || null,
-                guilt_free_factors: data.responses.q14 || null,
-                performance_impact: data.responses.q15 || null,
-                manager_app_features: data.responses.q16 || null,
-                
-                // All responses as JSON for backup
-                raw_responses: data.responses
-            };
-            
-            // Make the Supabase REST API call
-            const response = await fetch(`${this.supabaseUrl}/rest/v1/${this.tableName}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': this.supabaseKey,
-                    'Authorization': `Bearer ${this.supabaseKey}`,
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify(supabaseData)
-            });
-            
-            console.log('Response status:', response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Supabase error response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-            }
-            
-            const result = await response.json();
-            console.log('Supabase response:', result);
-            
-            console.log('Successfully submitted to Supabase:', result);
-            return { 
-                success: true, 
-                message: 'Survey response saved successfully',
-                data: result
-            };
-            
-        } catch (error) {
-            console.error('Supabase submission error:', error);
-            
-            // For fallback, log the data locally
-            console.log('Fallback - Data that would be submitted:', data);
-            
-            // Don't throw error to allow survey completion
-            return { 
-                success: false, 
-                error: error.message,
-                fallback: true 
-            };
-        }
-    }
-    
-    showLoadingState() {
-        const activeSlide = document.querySelector('.question-slide.active');
-        activeSlide.classList.add('loading');
-        
-        // Add loading indicator
-        const loadingDiv = document.createElement('div');
-        loadingDiv.innerHTML = '<p>Submitting your responses...</p>';
-        loadingDiv.style.position = 'fixed';
-        loadingDiv.style.top = '50%';
-        loadingDiv.style.left = '50%';
-        loadingDiv.style.transform = 'translate(-50%, -50%)';
-        loadingDiv.style.background = 'var(--bg-card)';
-        loadingDiv.style.padding = '2rem';
-        loadingDiv.style.borderRadius = '1rem';
-        loadingDiv.style.zIndex = '1000';
-        loadingDiv.id = 'loadingIndicator';
-        
-        document.body.appendChild(loadingDiv);
-    }
-    
-    showSummaryPage() {
-        // Remove loading indicator
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        if (loadingIndicator) {
-            loadingIndicator.remove();
-        }
-        
-        // Show summary slide
-        this.currentSlide = this.totalQuestions;
-        this.showSlide(this.totalQuestions);
-        this.updateProgress();
-        
-        // Populate response summary
-        this.populateResponseSummary();
-    }
-    
-    populateResponseSummary() {
+
+    populateSummary() {
         const summaryContainer = document.getElementById('responseSummary');
-        const questionMap = {
-            'q1': 'Employment Type',
-            'q2': 'Years of Experience',
-            'q3': 'Job Role Type',
-            'q4': 'Vacation Days Taken',
-            'q5': 'Reasons for Postponing Leave',
-            'q6': 'Emotions Associated with Leave',
-            'q7': 'Ever Faked Illness for Leave',
-            'q8': 'Manager\'s Leave Behavior',
-            'q9': 'Team\'s Attitude Rating',
-            'q10': 'Feel Judged When Taking Leave',
-            'q11': 'Top Reasons for Avoiding Leave',
-            'q12': 'Expectations During Approved Leave',
-            'q13': 'Nudge Reminder Response',
-            'q14': 'What Would Make Leave Easier',
-            'q15': 'Leave Impact on Performance',
-            'q16': 'Useful Manager App Features'
+        let html = '';
+        const questionOrder = this.history.slice(1); // Get the path taken, remove welcome screen
+        questionOrder.push(this.currentQuestionIndex); 
+        const uniqueQuestions = [...new Set(questionOrder)];
+
+        uniqueQuestions.forEach(index => {
+            const slide = this.slides[index];
+            const key = slide.id;
+            const value = this.responses[key];
+            const questionEl = document.getElementById(key);
+            if (value && value.length > 0) {
+                 const questionText = questionEl ? questionEl.querySelector('h2').textContent : key;
+                 const answer = Array.isArray(value) ? value.join(', ') : value;
+                 html += `<div class="summary-item"><p class="summary-question">${questionText}</p><p class="summary-answer">${answer}</p></div>`;
+            }
+        });
+        summaryContainer.innerHTML = html;
+    }
+    
+    async submitData() {
+        // Format data for Supabase
+        const dataToSubmit = {
+            // Q1-Q4
+            employment_type: this.responses.q1,
+            years_experience: this.responses.q2,
+            job_role_type: this.responses.q3,
+            vacation_days_taken: this.responses.q4,
+            // Q5
+            postponed_leave: this.responses.q5a,
+            postpone_reasons: this.responses.q5b,
+            cancelled_leave: this.responses.q5c,
+            cancel_reasons: this.responses.q5d,
+            // Q6-Q10
+            leave_emotions: this.responses.q6,
+            faked_illness: this.responses.q7,
+            manager_takes_leave: this.responses.q8,
+            team_attitude_rating: this.responses.q9,
+            feel_judged: this.responses.q10,
+            // Q11-Q12
+            avoid_leave_reasons: this.responses.q11,
+            leave_expectations: this.responses.q12,
+            // Q14-Q16
+            guilt_free_factors: this.responses.q14,
+            performance_impact: this.responses.q15,
+            manager_app_features: this.responses.q16,
+            // And a raw backup
+            raw_responses: this.responses
         };
         
-        let summaryHTML = '';
-        
-        Object.keys(this.responses).forEach(questionId => {
-            const questionText = questionMap[questionId];
-            const answer = this.responses[questionId];
-            let formattedAnswer;
-            
-            if (Array.isArray(answer)) {
-                formattedAnswer = answer.length > 0 ? answer.join(', ') : 'No response';
-            } else {
-                formattedAnswer = answer || 'No response';
+        // Submit to Supabase
+        if (this.supabase) {
+            try {
+                const { error } = await this.supabase
+                    .from('survey_responses')
+                    .insert([dataToSubmit]);
+                if (error) throw error;
+            } catch (e) {
+                console.error("Error submitting to Supabase:", e);
             }
-            
-            // Truncate long text responses
-            if (typeof formattedAnswer === 'string' && formattedAnswer.length > 100) {
-                formattedAnswer = formattedAnswer.substring(0, 97) + '...';
+        }
+
+        // To EmailJS (optional)
+        if (this.emailServiceId !== 'YOUR_SERVICE_ID') {
+            const templateParams = { ...this.responses, responses: JSON.stringify(this.responses, null, 2) };
+            try {
+                await emailjs.send(this.emailServiceId, this.emailTemplateId, templateParams);
+            } catch (e) {
+                console.error("Error sending email:", e);
             }
-            
-            summaryHTML += `
-                <div class="summary-item">
-                    <div class="summary-question">${questionText}</div>
-                    <div class="summary-answer">${formattedAnswer}</div>
-                </div>
-            `;
-        });
-        
-        summaryContainer.innerHTML = summaryHTML;
+        }
     }
 }
 
 // Initialize the survey when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     window.surveyApp = new SurveyApp();
-});
-
-// Global functions for HTML onclick handlers
-function nextQuestion() {
-    window.surveyApp.nextQuestion();
-}
-
-function previousQuestion() {
-    window.surveyApp.previousQuestion();
-} 
+}); 

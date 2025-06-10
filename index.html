@@ -28,7 +28,9 @@
                     <h1>Workplace Leave Culture Survey</h1>
                     <p class="subtitle">Understanding barriers to taking time off and workplace wellness culture</p>
                     <p class="description">This survey explores how workplace culture and personal attitudes affect employees' ability to take vacation leave. Your responses are anonymous and will help improve workplace wellness policies.</p>
-                    <button class="next-btn" onclick="nextQuestion()">Start Survey →</button>
+                    <div class="navigation-buttons">
+                        <button class="next-btn" id="startBtn">Start Survey →</button>
+                    </div>
                 </div>
             </div>
 
@@ -42,8 +44,11 @@
                         <div class="option" data-value="Full-Time (Permanent)">
                             <span>Full-Time (Permanent)</span>
                         </div>
-                        <div class="option" data-value="Contractual/Freelancer">
-                            <span>Contractual/Freelancer</span>
+                        <div class="option" data-value="Contractual">
+                            <span>Contractual</span>
+                        </div>
+                        <div class="option" data-value="Freelancer">
+                            <span>Freelancer</span>
                         </div>
                         <div class="option" data-value="Part-Time">
                             <span>Part-Time</span>
@@ -51,6 +56,10 @@
                         <div class="option" data-value="Intern">
                             <span>Intern</span>
                         </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -73,6 +82,10 @@
                             <span>10+ years</span>
                         </div>
                     </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
                 </div>
             </div>
 
@@ -81,8 +94,8 @@
                 <div class="question-content">
                     <h2>What is your job role type?</h2>
                     <div class="options-container">
-                        <div class="option" data-value="Junior employee">
-                            <span>Junior employee</span>
+                        <div class="option" data-value="Associate">
+                            <span>Associate</span>
                         </div>
                         <div class="option" data-value="Team Lead">
                             <span>Team Lead</span>
@@ -100,6 +113,10 @@
                             <span>HR</span>
                         </div>
                     </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
                 </div>
             </div>
 
@@ -110,72 +127,85 @@
                 <div class="question-content">
                     <h2>In the past 1 year, how many vacation leave days have you taken (excluding sick leave)?</h2>
                     <div class="options-container">
-                        <div class="option" data-value="None">
-                            <span>None</span>
-                        </div>
-                        <div class="option" data-value="1–3">
-                            <span>1–3</span>
-                        </div>
-                        <div class="option" data-value="4–6">
-                            <span>4–6</span>
-                        </div>
-                        <div class="option" data-value="7–10">
-                            <span>7–10</span>
-                        </div>
-                        <div class="option" data-value="10+">
-                            <span>10+</span>
-                        </div>
+                        <div class="option" data-value="None"><span>None</span></div>
+                        <div class="option" data-value="1–3"><span>1–3</span></div>
+                        <div class="option" data-value="4–6"><span>4–6</span></div>
+                        <div class="option" data-value="7–10"><span>7–10</span></div>
+                        <div class="option" data-value="10+"><span>10+</span></div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Question 5: Postponed Leave Reasons (Multi-select) -->
-            <div class="question-slide" id="q5">
+            <!-- Question 5a: Ever Postponed? -->
+            <div class="question-slide" id="q5a">
                 <div class="question-content">
-                    <h2>Have you ever postponed or cancelled a planned leave due to:</h2>
-                    <p class="subtitle">(Check all that apply)</p>
-                    <div class="options-container checkbox-options">
-                        <div class="checkbox-option" data-value="Guilt or shame about leaving the team">
-                            <input type="checkbox" id="reason1">
-                            <label for="reason1">Guilt or shame about leaving the team</label>
-                        </div>
-                        <div class="checkbox-option" data-value="Pressure from a manager or client">
-                            <input type="checkbox" id="reason2">
-                            <label for="reason2">Pressure from a manager or client</label>
-                        </div>
-                        <div class="checkbox-option" data-value="Feeling indispensable to the project">
-                            <input type="checkbox" id="reason3">
-                            <label for="reason3">Feeling indispensable to the project</label>
-                        </div>
-                        <div class="checkbox-option" data-value="Fear of missing out on opportunities">
-                            <input type="checkbox" id="reason4">
-                            <label for="reason4">Fear of missing out on opportunities</label>
-                        </div>
-                        <div class="checkbox-option" data-value="Anticipated work pile-up on return">
-                            <input type="checkbox" id="reason5">
-                            <label for="reason5">Anticipated work pile-up on return</label>
-                        </div>
-                        <div class="checkbox-option" data-value="Team is understaffed">
-                            <input type="checkbox" id="reason6">
-                            <label for="reason6">Team is understaffed</label>
-                        </div>
-                        <div class="checkbox-option" data-value="No specific reason">
-                            <input type="checkbox" id="reason7">
-                            <label for="reason7">No specific reason</label>
-                        </div>
-                        <div class="checkbox-option" data-value="I don't feel comfortable taking leave">
-                            <input type="checkbox" id="reason8">
-                            <label for="reason8">I don't feel comfortable taking leave</label>
-                        </div>
-                        <div class="checkbox-option other-option">
-                            <input type="checkbox" id="reason_other">
-                            <label for="reason_other">Other:</label>
-                            <input type="text" class="other-input" placeholder="Please specify..." disabled>
-                        </div>
+                    <h2>Have you ever postponed a planned leave?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Yes"><span>Yes</span></div>
+                        <div class="option" data-value="No"><span>No</span></div>
                     </div>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5b: Reasons for Postponing -->
+            <div class="question-slide" id="q5b">
+                <div class="question-content">
+                    <h2>What were the main reasons for postponing your leave?</h2>
+                    <p class="subtitle">(Check all that apply)</p>
+                    <div class="options-container checkbox-options">
+                        <div class="checkbox-option" data-value="Guilt or shame about leaving the team"><input type="checkbox" id="postpone_reason1"><label for="postpone_reason1">Guilt or shame about leaving the team</label></div>
+                        <div class="checkbox-option" data-value="Pressure from a manager or client"><input type="checkbox" id="postpone_reason2"><label for="postpone_reason2">Pressure from a manager or client</label></div>
+                        <div class="checkbox-option" data-value="Feeling indispensable to the project"><input type="checkbox" id="postpone_reason3"><label for="postpone_reason3">Feeling indispensable to the project</label></div>
+                        <div class="checkbox-option" data-value="Fear of missing out on opportunities"><input type="checkbox" id="postpone_reason4"><label for="postpone_reason4">Fear of missing out on opportunities</label></div>
+                        <div class="checkbox-option" data-value="Anticipated work pile-up on return"><input type="checkbox" id="postpone_reason5"><label for="postpone_reason5">Anticipated work pile-up on return</label></div>
+                        <div class="checkbox-option" data-value="Team is understaffed"><input type="checkbox" id="postpone_reason6"><label for="postpone_reason6">Team is understaffed</label></div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5c: Ever Cancelled? -->
+            <div class="question-slide" id="q5c">
+                <div class="question-content">
+                    <h2>Have you ever cancelled a planned leave?</h2>
+                    <div class="options-container">
+                        <div class="option" data-value="Yes"><span>Yes</span></div>
+                        <div class="option" data-value="No"><span>No</span></div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 5d: Reasons for Cancelling -->
+            <div class="question-slide" id="q5d">
+                <div class="question-content">
+                    <h2>What were the main reasons for cancelling your leave?</h2>
+                    <p class="subtitle">(Check all that apply)</p>
+                    <div class="options-container checkbox-options">
+                        <div class="checkbox-option" data-value="Guilt or shame about leaving the team"><input type="checkbox" id="cancel_reason1"><label for="cancel_reason1">Guilt or shame about leaving the team</label></div>
+                        <div class="checkbox-option" data-value="Pressure from a manager or client"><input type="checkbox" id="cancel_reason2"><label for="cancel_reason2">Pressure from a manager or client</label></div>
+                        <div class="checkbox-option" data-value="Feeling indispensable to the project"><input type="checkbox" id="cancel_reason3"><label for="cancel_reason3">Feeling indispensable to the project</label></div>
+                        <div class="checkbox-option" data-value="Fear of missing out on opportunities"><input type="checkbox" id="cancel_reason4"><label for="cancel_reason4">Fear of missing out on opportunities</label></div>
+                        <div class="checkbox-option" data-value="Anticipated work pile-up on return"><input type="checkbox" id="cancel_reason5"><label for="cancel_reason5">Anticipated work pile-up on return</label></div>
+                        <div class="checkbox-option" data-value="Team is understaffed"><input type="checkbox" id="cancel_reason6"><label for="cancel_reason6">Team is understaffed</label></div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -204,6 +234,10 @@
                             <span>Shame</span>
                         </div>
                     </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
                 </div>
             </div>
 
@@ -218,6 +252,10 @@
                         <div class="option" data-value="No">
                             <span>No</span>
                         </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -242,6 +280,10 @@
                             <span>I don't know</span>
                         </div>
                     </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
                 </div>
             </div>
 
@@ -259,6 +301,10 @@
                             <div class="rating-label">Taking leave is respected and encouraged</div>
                         </div>
                     </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
+                    </div>
                 </div>
             </div>
 
@@ -273,6 +319,10 @@
                         <div class="option" data-value="Disagree">
                             <span>Disagree</span>
                         </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -323,8 +373,8 @@
                         <span id="selectionCount">0</span> of 3 selected
                     </div>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -353,29 +403,8 @@
                         </div>
                     </div>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()" disabled>Next →</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Question 13: Nudge Response -->
-            <div class="question-slide" id="q13">
-                <div class="question-content">
-                    <h2>Would a reminder like this change your perception?</h2>
-                    <div class="nudge-quote">
-                        "Skipping this break may cost you more than it saves—60% of burnout stems from avoided recovery time."
-                    </div>
-                    <div class="options-container">
-                        <div class="option" data-value="Yes">
-                            <span>Yes</span>
-                        </div>
-                        <div class="option" data-value="No">
-                            <span>No</span>
-                        </div>
-                        <div class="option" data-value="Maybe">
-                            <span>Maybe</span>
-                        </div>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -389,8 +418,8 @@
                     <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
                     <p class="optional-note">This question is optional</p>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -402,8 +431,8 @@
                     <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
                     <p class="optional-note">This question is optional</p>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -415,8 +444,8 @@
                     <textarea class="text-input" placeholder="Share your thoughts..." rows="6"></textarea>
                     <p class="optional-note">This question is optional</p>
                     <div class="navigation-buttons">
-                        <button class="prev-btn" onclick="previousQuestion()">← Previous</button>
-                        <button class="next-btn" onclick="nextQuestion()">Next →</button>
+                        <button class="prev-btn">←</button>
+                        <button class="next-btn">Finish</button>
                     </div>
                 </div>
             </div>
@@ -440,7 +469,8 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
